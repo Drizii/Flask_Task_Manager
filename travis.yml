@@ -1,0 +1,15 @@
+language: python
+python:
+  - "3.9"
+
+
+install:
+  - pip install -r requirements-dev.txt
+  - pip install isort black
+  - pip install coveralls
+script:
+  - pytest my-package
+  - isort --profile black my-package
+  - black --check --diff my-package
+after_success:
+  - coveralls
