@@ -4,7 +4,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\Users\\Admin\\PycharmProjects\\Flask_Task_Manager\\test.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -29,26 +30,37 @@ def index():
             db.session.commit()
             return redirect('/')
         except:
-            return "No to mamy problem"
+            return 'There was an issue adding your task'
     else:
         tasks = Todo.query.order_by(Todo.date_created).all()
         return render_template('index.html', tasks=tasks)
 
 
-# @app.route('/create')
-# def create():
-#     db.create_all()
-#     return 'All tables created! kurwa obejściówka'
+@app.route("/delete/<int:id>", )
+def delete(id):
+    task_to_delete = Todo.query.get_or_404(id)
+    try:
+        db.session.delete(task_to_delete)
+        db.session.commit()
+        return redirect("/")
+    except:
+        'There was a problem deleting that task'
+
+
+@app.route("/update/<int:id>", methods=["POST", "GET"])
+def update(id):
+    task = Todo.query.get_or_404(id)
+    if request.method == "POST":
+        task.content = request.form['content']
+        try:
+            db.session.commit()
+            return redirect('/')
+        except:
+            return 'There was an issue updating your task'
+    else:
+        return render_template("update.html", task=task)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-
-def create_app():
-    app = Flask(__name__)
-
-    with app.app_context():
-        init_db()
-
-    return app
